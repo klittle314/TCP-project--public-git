@@ -1,8 +1,9 @@
+#ui.R
+
 shinyUI(fluidPage(
   titlePanel("TCP Starter Kit data"),
   
-   
-  
+     
   sidebarLayout(
     sidebarPanel(
       h3 ("App Purpose"),
@@ -10,7 +11,7 @@ shinyUI(fluidPage(
                "on visits and downloads of The Starter Kit, English adult version."," Default view is the past 30 days.",
                " We count downloads as unique pageViews of /03/TCP_StarterKit_2015_Final_Writeable.pdf ."),
       h3 ("Contact"),
-      helpText("Kevin Little, Ph.D., Informing Ecological Design, LLC, klittle@iecodesign.com.  Last update 24 April 2015",
+      helpText("Kevin Little, Ph.D., Informing Ecological Design, LLC, klittle@iecodesign.com.  Last update 28 April 2015",
                ""),
       h3 (""),
       dateRangeInput('dateRange',
@@ -35,14 +36,9 @@ shinyUI(fluidPage(
               tabPanel("Main Plot", plotOutput("main_plot",height="800px")),
               tabPanel("Table of Data",dataTableOutput("table")),
               tabPanel("Table of Annotations",dataTableOutput("file_notes"))
-      
+    
     )
    )
-#       mainPanel(
-#         textOutput("start"),
-#         textOutput("end"),
-#         tableOutput("table")
-#       )
   )
  )
 )

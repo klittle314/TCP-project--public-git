@@ -4,7 +4,7 @@ source("global.R")
 
 shinyServer(function(input, output) {
 
- 
+#create values for start and end dates of the data range and the median reference 
 ga.start <- reactive({
    input$dateRange[1] 
  })
@@ -21,8 +21,6 @@ med.end <- reactive({
   me <- input$dateRangeM[2]
 })
 
-# output$start <- renderText({as.character(as.Date(ga.start()))})
-# output$end <- renderText({as.character(as.Date(ga.end()))})
 
 #create a reactive dataframe using the input date range
 ga.data <- reactive({
@@ -32,26 +30,7 @@ ga.data <- reactive({
 })
 
 
-# #ga.data <- ga.dataA
-#  
-#  Pct_download_DOW <- as.vector(by(ga.data()$pct_download,ga.data()$Day.of.Week, median,na.rm=TRUE))
-#  SK_downloads_DOW <- as.vector(by(ga.data()$SK_downloads,ga.data()$Day.of.Week,median,na.rm=TRUE))
-#  TotVis_NU_DOW <- as.vector(by(ga.data()$TotVis_NU,ga.data()$Day.of.Week,median,na.rm=TRUE))
- 
- 
-#  Table_medians <- data.frame(levels(ga.data()$Day.of.Week),SK_downloads_DOW,TotVis_NU_DOW,Pct_download_DOW)
-#  names(Table_medians) <- c("Day of Week","SK downloads","Tot Visits","Pct Download")
-#  Table_medians[,4] <- formatC(Table_medians[,4],digits=1,format="f")
-#  Table_medians[,3] <- formatC(Table_medians[,3],digits=0,format="d")
-#  Table_medians[,2] <- formatC(Table_medians[,2],digits=0,format="d")
- 
- #dataframes of median values for horiz ref lines in the small multiples facetted ggplot
-#  dfPct <- make_ref(Pct_download_DOW,df=ga.data())
-#  dfSKDL <- make_ref(SK_downloads_DOW,df=ga.data())
-#  dfTotVis <- make_ref(TotVis_NU_DOW,df=ga.data())
-
-
- #Titles <- c("N SK downloads","N Total Visitors, Non-Unique",paste0("Percent Downloads, median from ",ga.data()$Date[m_idx]))
+#create titles for the plots
 Titles <- c("N SK downloads","N Total Visitors, Non-Unique","Percent Downloads")
  
 #create reactive reference medians.  It appears that function calls cannot have more than one "direct" reactive argument.
@@ -74,19 +53,6 @@ ref_medTV <- reactive({
 })
 
 
-# #define the upload file 
-# output$file_notes <- renderTable({ 
-#   inFile <- input$files
-#   if (is.null(inFile)) {
-#     # User has not uploaded a file yet
-#     return(NULL)
-#   }
-#   
-#   #input$files
-#   
-#   data_notes <- read.csv(inFile$datapath, header=T, stringsAsFactors =F)
-#   return(data_notes)
-# })
 
 #define the upload file and extract the annotations from the annotation file to add to the plot
 df_notes <- reactive({
@@ -107,8 +73,7 @@ output$file_notes <- renderDataTable({
 })
 
 
-
-# #set up overlay rectangles for the plots as a reactive dataframe
+ #set up overlay rectangles, used to show annotation periods, for the plots as a reactive dataframe
 dfrect <- reactive({
   df_out <- data.frame(
     xmin = df_notes()$Start_Date,
@@ -131,7 +96,6 @@ dftext <- reactive({
 })
 
 #create reactive plot objects, conditional on the presence of the annotation file
-
 p0p <- reactive({
   if(is.null(df_notes())){
     pz <- pmed1(df=ga.data(),y_idx=12,title2=Titles[3]) #+ geom_text(x=x1,y=25,label="Jan Death over Dinner",size=3)
@@ -140,10 +104,6 @@ p0p <- reactive({
     pz <- pmed1(df=ga.data(),y_idx=12,title2=Titles[3]) 
     pz1 <- pz + geom_hline(yintercept=ref_medPct(),lty=2) 
     pz1.1 <- pz1 + geom_rect(data=dfrect(),aes(NULL,NULL,xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),fill="gray80",alpha=0.5)
-#     df_text <- data.frame(
-#       xtext = df_notes()$Start_Date,
-#       ytext = .9*max(ga.data()[,12],na.rm=TRUE),
-#       label = df_notes()$Test_description)
     pz1.2 <- pz1.1 + geom_text(data=dftext(),aes(x=xtext,y=ytext1,label=label),size=4)
   }
   })
@@ -177,7 +137,6 @@ p0TNU <- reactive({
 #render the plot for display, conditional on the annotation file being loaded.
 output$main_plot <- renderPlot({
     pall0 <- grid.arrange(p0p(),p0SK(),p0TNU(), 
-                        #main=paste0("Summary of Download Activity, TCP website ",min(ga.data()$Date)," - ",max(ga.data()$Date)),
                       main="Summary of Download Activity, TCP website" , 
                       ncol=1)
    print(pall0)
@@ -208,16 +167,6 @@ output$downloadData <- downloadHandler(
       write.csv(ga.data()[,c(5,11,4,10,12)], file, row.names=FALSE)
     }
   )
- })
 
-# #define the upload file 
-# output$filetable <- renderTable({ 
-#   if (is.null(input$files)) {
-#     # User has not uploaded a file yet
-#     return(NULL)
-#   }
-#   
-#   #input$files
-#   inFile <- input$files
-#   data_notes<-read.csv(inFile$datapath, header=T, stringsAsFactors =F)
-# })
+})
+

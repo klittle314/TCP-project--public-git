@@ -1,3 +1,6 @@
+#Shiny app TCP STarter Kit Data
+#Kevin Little, Ph.D.  28 April 2015
+
 # Assumes valid token has been set up and saved in the workspace, else throws an error message
 
 #set colour blind palette
@@ -83,12 +86,5 @@ ga.dataA$pct_download <- 100*ga.dataA$uniquePageviews/ga.dataA$users
 names(ga.dataA)[10] <- "SK_downloads"
 names(ga.dataA)[4] <- "TotVis_NU"
 
-#Baseline index start  Need to make the choice of indices for median an input  Needs to be in ui and server code
-m_idx <- 1
-
-#order the factor in calendar order M-Su not alphabetical:  done by wday function
-#ga.data$Day.of.Week <- factor(ga.data$Day.of.Week,levels(ga.data$Day.of.Week)[c(2,6,7,5,1,3,4)])
 
 
-
-#create reactive table based on chosen data range.
